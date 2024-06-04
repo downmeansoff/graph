@@ -103,5 +103,38 @@ public:
                            }); // Проверяем, есть ли ребро ed в контейнере _edges для вершины ed.from
     }
 
+    bool remove_edge(const V &from, const V &to) {
+        // Метод удаляет ребро между вершинами from и to
+        if (!_edges.contains(from) || !_vertices.contains(to))
+            return false; // Проверяем, существуют ли вершины from и to в графе
+        auto cnt_erased = 0; // Переменная для подсчета удаленных ребер
+        cnt_erased += std::erase_if(_edges[from],
+                                    [to](const Edge &edge) {
+                                        return edge.to == to;
+                                    }); // Удаляем ребро с вершиной "to" из контейнера _edges для вершины from
+        if (cnt_erased) return true; // Возвращаем true, если было удалено хотя бы одно ребро
+        return false; // Возвращаем false, если ребро не было найдено и удалено
+    }
+
+    bool remove_edge(const Edge &ed) {
+        // Метод удаляет ребро ed из графа
+        if (!_edges.contains(ed.from) || !_vertices.contains(ed.to))
+            return false; // Проверяем, существуют ли вершины from и to ребра ed в графе
+        auto cnt_erased = 0; // Переменная для подсчета удаленных ребер
+        cnt_erased += std::erase_if(_edges[ed.from],
+                                    [ed](const Edge &edge) {
+                                        return edge.to == ed.to &&
+                                               std::fabs(edge.distance - ed.distance) <
+                                               std::numeric_limits<double>::epsilon();
+                                    }); // Удаляем ребро ed из контейнера _edges для вершины ed.from
+        if (cnt_erased) return true; // Возвращаем true, если было удалено хотя бы одно ребро
+        return false; // Возвращаем false, если ребро не было найдено и удалено
+    }
+    std::vector<Edge> edges(const V &vertex) const {
+        // Метод возвращает вектор ребер, инцидентных заданной вершине vertex
+        if (!has_vertex(vertex)) return {}; // Если вершина не существует, возвращаем пустой вектор
+        return _edges.at(vertex); // Возвращаем вектор ребер, инцидентных вершине vertex
+    }
+
 
 };
