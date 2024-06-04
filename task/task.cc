@@ -46,7 +46,6 @@ V find_the_vertex_for_warehouse(const Graph<V, D>& graph) {
 
     // Если оптимальный склад не найден, выбрасываем исключение
     if (!found) throw std::runtime_error("Graph is not fully connected.");
-    std::cout << min_avg_distance;
     return optimal_warehouse; // Возвращаем оптимальный склад
 }
 
