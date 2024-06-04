@@ -36,3 +36,19 @@ TEST(graph_test,remove_edge){
     ASSERT_FALSE(graph.remove_edge({3,4,5.0}));
     ASSERT_TRUE(graph.remove_edge(3,5));
 }
+
+TEST(graph_test,order){
+    Graph<int,double> graph;
+    graph.add_vertex(3);
+    graph.add_vertex(4);
+    graph.add_vertex(5);
+    ASSERT_EQ(graph.order(),3);
+}
+
+TEST(graph_test,degree){
+    Graph<int,double> graph;
+    graph.add_vertex(3);
+    graph.add_vertex(4);
+    graph.add_edge(3,4,6.0);
+    ASSERT_EQ(graph.degree(3),1);
+}

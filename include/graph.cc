@@ -136,5 +136,34 @@ public:
         return _edges.at(vertex); // Возвращаем вектор ребер, инцидентных вершине vertex
     }
 
+    size_t order() const {
+        // Метод возвращает количество вершин в графе
+        return _edges.size(); // Возвращаем размер контейнера _edges, который представляет количество вершин
+    }
 
+    size_t degree(const V &v) const {
+        // Метод возвращает степень вершины v в графе
+        if (!has_vertex(v)) return 0; // Если вершина не существует, возвращаем 0
+        return _edges.at(v).size(); // Возвращаем размер вектора ребер, инцидентных вершине v
+    }
+
+    // Обход графа в глубину
+    void walk(const V& start_vertex, std::function<void(const V&)> action) const {
+        // Метод выполняет обход графа в глубину, начиная с вершины start_vertex и выполняя действие action на каждой вершине
+        std::unordered_map<V, bool> visited;
+        // visited - хранит информацию о посещенных вершинах
+        std::function<void(const V&)> dfs = [&](const V& vertex) {
+            // Внутренняя функция dfs для рекурсивного обхода графа
+            visited[vertex] = true; // Помечаем текущую вершину как посещенную
+            action(vertex); // Выполняем действие на текущей вершине
+            for (const Edge& edge : _edges.at(vertex)) {
+                // Перебираем ребра, инцидентные текущей вершине
+                if (!visited[edge.to]) {
+                    // Если смежная вершина еще не посещена
+                    dfs(edge.to); // Рекурсивно вызываем обход для смежной вершины
+                }
+            }
+        };
+        dfs(start_vertex); // Начинаем обход с вершины start_vertex
+    }
 };
