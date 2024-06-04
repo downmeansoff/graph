@@ -77,6 +77,8 @@ public:
             throw std::invalid_argument("from is not exist"); // Проверяем, существует ли вершина from в графе
         if (!_vertices.contains(to))
             throw std::invalid_argument("to is not exist"); // Проверяем, существует ли вершина to в графе
+        if (distance < 0)
+            throw std::invalid_argument("invalid distance"); // Проверяем, что вес ребра неотприцательный,тк у нас используется алгоритм дейкстры
         _edges[from].push_back({from, to, distance}); // Добавляем ребро в контейнер _edges для вершины from
     }
 
@@ -165,5 +167,56 @@ public:
             }
         };
         dfs(start_vertex); // Начинаем обход с вершины start_vertex
+    }
+
+
+    // Поиск кратчайшего пути методом Дейкстры
+    std::vector<Edge> shortest_path(const V& start, const V& end) const {
+        // Метод находит кратчайший путь между вершинами start и end с использованием алгоритма Дейкстры
+        if (!_vertices.contains(start) || !_vertices.contains(end)) throw std::invalid_argument("not found");
+        // Проверяем, существуют ли вершины start и end в графе. Если нет, выбрасываем исключение.
+
+        std::unordered_map<V, D> distances;
+        // distances - хранит расстояния от начальной вершины до остальных вершин
+        for (const auto& vert : _vertices) distances[vert] = std::numeric_limits<D>::infinity();
+        // Инициализируем расстояния как бесконечность для всех вершин графа
+        distances[start] = 0; // Расстояние от начальной вершины до самой себя равно 0
+
+        std::vector<Edge> path; // Путь от start до end
+        std::priority_queue<std::pair<D, V>> priority_queue;
+        // priority_queue - очередь с приоритетом для обработки вершин, где первыми обрабатываются вершины с наименьшим расстоянием
+        priority_queue.push({ 0, start }); // Добавляем начальную вершину в очередь с расстоянием 0
+
+        std::unordered_map<V, V> prev;
+        // prev - хранит предыдущие вершины для восстановления пути
+        while (!priority_queue.empty()) {
+            std::pair<D, V> current = priority_queue.top();
+            priority_queue.pop();
+
+            for (const auto& edge : _edges.at(current.second)) {
+                // Перебираем ребра, инцидентные текущей вершине
+                D new_dist = current.first + edge.distance;
+                // Вычисляем новое расстояние до смежной вершины через текущее ребро
+                if (new_dist < distances[edge.to]) {
+                    // Если новое расстояние меньше, чем текущее известное расстояние до вершины
+                    prev[edge.to] = current.second; // Обновляем предыдущую вершину для восстановления пути
+                    distances[edge.to] = new_dist; // Обновляем расстояние до вершины
+                    priority_queue.push({ new_dist, edge.to }); // Добавляем вершину в очередь для дальнейшей обработки
+                }
+            }
+        }
+        if (distances[end] == std::numeric_limits<D>::infinity()) return {};
+        // Если путь до конечной вершины не найден, возвращаем пустой вектор
+
+        V current = end;
+        while (current != start) {
+            // Восстанавливаем кратчайший путь, начиная с конечной вершины
+            V prev_v = prev[current];
+            D dist = distances[current] - distances[prev_v];
+            path.push_back(Edge{ prev_v, current, dist });
+            current = prev_v;
+        }
+        reverse(path.begin(), path.end()); // Разворачиваем путь, чтобы он шел от start к end
+        return path; // Возвращаем кратчайший путь
     }
 };
