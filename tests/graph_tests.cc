@@ -14,3 +14,12 @@ TEST(graph_test,delete_vertex){
     graph.remove_vertex(3);
     ASSERT_FALSE(graph.has_vertex(3));
 }
+
+TEST(graph_test,add_edge){
+    Graph<int,double> graph;
+    graph.add_vertex(3);
+    graph.add_vertex(4);
+    graph.add_edge(3,4,6.0);
+    ASSERT_TRUE(graph.has_edge(3,4));
+    ASSERT_FALSE(graph.has_edge({3,4,5.0}));
+}

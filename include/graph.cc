@@ -71,4 +71,37 @@ public:
         return vertices; // Возвращаем вектор всех вершин
     }
 
+    void add_edge(const V &from, const V &to, const D &distance) {
+        // Метод добавляет ребро между вершинами from и to с заданным расстоянием distance
+        if (!_vertices.contains(from))
+            throw std::invalid_argument("from is not exist"); // Проверяем, существует ли вершина from в графе
+        if (!_vertices.contains(to))
+            throw std::invalid_argument("to is not exist"); // Проверяем, существует ли вершина to в графе
+        _edges[from].push_back({from, to, distance}); // Добавляем ребро в контейнер _edges для вершины from
+    }
+
+    bool has_edge(const V &from, const V &to) const {
+        // Метод проверяет наличие ребра между вершинами from и to
+        if (!_vertices.contains(from) || !_vertices.contains(to))
+            return false; // Проверяем, существуют ли вершины from и to в графе
+        return std::any_of(_edges.at(from).begin(),
+                           _edges.at(from).end(),
+                           [to](const Edge &ed) {
+                               return ed.to == to;
+                           }); // Проверяем, есть ли ребро с вершиной "to" для вершины from
+    }
+
+    bool has_edge(const Edge &ed) const {
+        // Метод проверяет наличие ребра ed в графе с учетом расстояния
+        if (!_vertices.contains(ed.to) || !_vertices.contains(ed.from))
+            return false; // Проверяем, существуют ли вершины from и to ребра ed в графе
+        return std::any_of(_edges.at(ed.from).begin(),
+                           _edges.at(ed.from).end(),
+                           [ed](const Edge &edge) {
+                               return ed.to == edge.to &&
+                                      std::fabs(edge.distance - ed.distance) < std::numeric_limits<double>::epsilon();
+                           }); // Проверяем, есть ли ребро ed в контейнере _edges для вершины ed.from
+    }
+
+
 };
